@@ -27,47 +27,51 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 
 function sqlFilter(data) {
   
-  //Checks for valid filter
+  //Checks for valid filter options
   if ((!Object.hasOwn(data,"name")) && (!Object.hasOwn(data,"minEmployees")) && (!Object.hasOwn(data,"maxEmployees"))) {
     return {filterCols: "No Filter"}
   }
 
   else {
-
     let idx = 0;
     let values = [];
     let cols =[];
     
     // Current filter options
+    // Case insentive name filter
     if (Object.hasOwn(data,"name")) {
-      idx = idx + 1;
+      idx += 1;
       values.push(`%${data["name"]}%`)
       cols.push(`"name" ILIKE ($${idx})`);
     }
-
+    // min and max filter
     if (Object.hasOwn(data,"minEmployees") && Object.hasOwn(data,"maxEmployees")) {
-      idx = idx + 1;
+      idx +=2;
       if (data["minEmployees"] < data["maxEmployees"]){
         values.push(data["minEmployees"])
         values.push(data["maxEmployees"])
-        cols.push(`"num_employees" BETWEEN $${idx} AND $${idx + 1}`);
-        idx = idx + 1;
+        cols.push(`"num_employees" BETWEEN $${idx-1} AND $${idx}`);
       }
       else{
         throw new BadRequestError("Min cannot be greater than Max")
       }
     }
+    // min filter
     else if (Object.hasOwn(data,"minEmployees") ){
-      idx = idx + 1;
+      idx +=1;
       values.push(data["minEmployees"])
       cols.push(`"num_employees">=$${idx}`);
     }
+    // max filter
     else if (Object.hasOwn(data,"maxEmployees")) {
-      idx = idx + 1;
+      idx +=1;
       values.push(data["maxEmployees"])
       cols.push(`"num_employees"<=$${idx}`);
     }
-
+    console.log({
+      filterCols: cols.join(" AND "),
+      values: values,
+    })
     return {
       filterCols: cols.join(" AND "),
       values: values,
