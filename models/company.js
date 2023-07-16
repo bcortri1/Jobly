@@ -69,7 +69,8 @@ class Company {
 
     static async filterAll(data) {
         const { filterCols, values } = sqlFilter(data)
-        if (filterCols === "No Filter") {
+        if ((filterCols === "No Filter")||(values === [])) {
+            //could have it findAll
             return "No Filter"
         }
         else {
@@ -164,6 +165,7 @@ class Company {
            RETURNING handle`,
             [handle]);
         const company = result.rows[0];
+        console.log(company)
 
         if (!company) throw new NotFoundError(`No company: ${handle}`);
     }

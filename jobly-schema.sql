@@ -17,7 +17,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE jobs (
-  id SERIAL PRIMARY KEY,
+  id SERIAL PRIMARY KEY CHECK (),
   title TEXT NOT NULL,
   salary INTEGER CHECK (salary >= 0),
   equity NUMERIC CHECK (equity <= 1.0),

@@ -28,9 +28,18 @@ function sqlForPartialUpdate(dataToUpdate, jsToSql) {
 function sqlFilter(data) {
   
   //Checks for valid filter options
-  if ((!Object.hasOwn(data,"name")) && (!Object.hasOwn(data,"minEmployees")) && (!Object.hasOwn(data,"maxEmployees"))) {
-    return {filterCols: "No Filter"}
-  }
+    const filterList=[
+        "name",
+        "minEmployees",
+        "maxEmployees",
+        "title",
+        "minSalary",
+        "hasEquity"
+    ]
+    if(!filterList.some((filter)=> Object.hasOwn(data, filter))){
+        return {filterCols: "No Filter", values:[]}
+    }
+
 
   else {
     let idx = 0;
@@ -44,7 +53,7 @@ function sqlFilter(data) {
       values.push(`%${data["name"]}%`)
       cols.push(`"name" ILIKE ($${idx})`);
     }
-    // min and max filter
+    // min and max employee filter
     if (Object.hasOwn(data,"minEmployees") && Object.hasOwn(data,"maxEmployees")) {
       idx +=2;
       if (data["minEmployees"] < data["maxEmployees"]){
@@ -56,22 +65,45 @@ function sqlFilter(data) {
         throw new BadRequestError("Min cannot be greater than Max")
       }
     }
-    // min filter
+    // min employee filter
     else if (Object.hasOwn(data,"minEmployees") ){
       idx +=1;
       values.push(data["minEmployees"])
       cols.push(`"num_employees">=$${idx}`);
     }
-    // max filter
+    // max employee filter
     else if (Object.hasOwn(data,"maxEmployees")) {
       idx +=1;
       values.push(data["maxEmployees"])
       cols.push(`"num_employees"<=$${idx}`);
     }
-    console.log({
-      filterCols: cols.join(" AND "),
-      values: values,
-    })
+
+    // Case insentive title filter
+    if (Object.hasOwn(data,"title")) {
+        idx += 1;
+        values.push(`%${data["title"]}%`)
+        cols.push(`"title" ILIKE ($${idx})`);
+    }
+    // min salary filter
+    if (Object.hasOwn(data,"minSalary") ){
+        idx +=1;
+        values.push(data["minSalary"])
+        cols.push(`"salary">=$${idx}`);
+    }
+    // has equity filter
+    if (Object.hasOwn(data,"hasEquity")){
+        if (data.hasEquity === true){
+            idx +=1;
+            values.push("0")
+            cols.push(`"equity">$${idx}`);
+        }
+        else if(data.hasEquity === false){
+            idx +=1;
+            values.push("0")
+            cols.push(`"equity">=$${idx}`);
+        }
+    }
+
     return {
       filterCols: cols.join(" AND "),
       values: values,
