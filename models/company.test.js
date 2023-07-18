@@ -237,7 +237,7 @@ describe("filterAll", function () {
     });
 
     test("No Filter", async function () {
-        expect(await Company.filterAll({})).toEqual("No Filter")
+        expect(await Company.filterAll({})).toEqual(await Company.findAll())
     });
 });
 

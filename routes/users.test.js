@@ -126,6 +126,45 @@ describe("POST /users", function () {
     });
 });
 
+/************************************** POST /users/:username/jobs/:id */
+describe("POST /users/:username/jobs/:id", function () {
+    test("works for admins: apply for another user", async function () {
+        const jobs = await db.query("SELECT * FROM jobs");
+        
+        const resp = await request(app)
+            .post(`/users/u1/jobs/${jobs.rows[1].id}`)
+            .set("authorization", `Bearer ${u4Token}`);
+        expect(resp.statusCode).toEqual(200);
+        expect(resp.body).toEqual({applied: jobs.rows[1].id});
+    });
+
+    test("works for correct user", async function () {
+        const jobs = await db.query("SELECT * FROM jobs");
+        console.log(jobs.rows[1].id)
+        const resp = await request(app)
+            .post(`/users/u1/jobs/${jobs.rows[1].id}`)
+            .set("authorization", `Bearer ${u1Token}`);
+        
+        expect(resp.statusCode).toEqual(200);
+        expect(resp.body).toEqual({applied: jobs.rows[1].id});
+    });
+
+    test("unauth for anon", async function () {
+        const resp = await request(app)
+            .post("/users/:username/jobs/:ids")
+            .send({
+                username: "u-new",
+                firstName: "First-new",
+                lastName: "Last-newL",
+                password: "password-new",
+                email: "new@email.com",
+                isAdmin: true,
+            });
+        expect(resp.statusCode).toEqual(401);
+    });
+
+});
+
 /************************************** GET /users */
 
 describe("GET /users", function () {
@@ -196,6 +235,8 @@ describe("GET /users", function () {
 
 describe("GET /users/:username", function () {
     test("works for matching user", async function () {
+        let job1 = await db.query('SELECT * FROM jobs WHERE title=$1',["j1"]);
+        job1= job1.rows[0]
         const resp = await request(app)
             .get(`/users/u1`)
             .set("authorization", `Bearer ${u1Token}`);
@@ -207,6 +248,7 @@ describe("GET /users/:username", function () {
                 email: "user1@user.com",
                 isAdmin: false,
             },
+            jobs:[job1.id],
         });
     });
 

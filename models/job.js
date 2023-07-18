@@ -48,8 +48,8 @@ class Job {
     static async filterAll(data) {
         const { filterCols, values } = sqlFilter(data)
         if ((filterCols === "No Filter")||(values === [])) {
-            //could have it findAll
-            return "No Filter"
+            // Will default to findAll
+            return Job.findAll();
         }
         else {
             const jobsRes = await db.query(

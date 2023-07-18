@@ -61,21 +61,40 @@ router.get("/", ensureAdmin, async function (req, res, next) {
 });
 
 
-/** GET /[username] => { user }
+/** GET /[username]/jobs/[jobId] => { ...user, jobs: [jobId, jobId, ...] }
  *
- * Returns { username, firstName, lastName, isAdmin }
+ * Returns { username, firstName, lastName, isAdmin, jobs: [] }
  *
  * Authorization required: login of correct user or admin
  **/
 
 router.get("/:username", ensureCorrectUser, async function (req, res, next) {
-  try {
-    const user = await User.get(req.params.username);
-    return res.json({ user });
-  } catch (err) {
-    return next(err);
-  }
-});
+    try {
+      const user = await User.get(req.params.username);
+      const jobs = await User.getAllApps(req.params.username);
+      return res.json({ user, jobs: jobs.jobId });
+    } catch (err) {
+      return next(err);
+    }
+  });
+
+
+/** POST /[username]/jobs/[jobId] => { applied: jobId }
+ *
+ * Returns { applied: jobId }
+ *
+ * Authorization required: login of correct user or admin
+ **/
+
+router.post("/:username/jobs/:jobId", ensureCorrectUser, async function (req, res, next) {
+    try {
+      const result = await User.apply(req.params.username, req.params.jobId);
+      return res.json({ applied: result.jobId });
+    } catch (err) {
+      return next(err);
+    }
+  });
+  
 
 
 /** PATCH /[username] { user } => { user }

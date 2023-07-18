@@ -204,6 +204,35 @@ class User {
 
     if (!user) throw new NotFoundError(`No user: ${username}`);
   }
+
+    /** Add user application for a job to the database; returns {applied: jobId}. */
+
+    static async apply(username, jobId) {
+            let result = await db.query(
+                `INSERT INTO applications
+                (username,
+                 job_id)
+                VALUES ($1, $2)
+                RETURNING job_id AS "jobId"`,
+                [username,jobId],
+            );
+        if (!result.rows[0]) throw new BadRequestError(`Invalid data`);
+            return result.rows[0];
+    }
+
+    /** Returns all jobs user applied for; returns [jobId, jobId, ...]. */
+
+    static async getAllApps(username) {
+            let result = await db.query(
+                `SELECT array_agg(job_id) AS "jobId" FROM applications
+                WHERE username=$1`,
+                [username],
+            );
+            const applications = result.rows[0];
+            if (!applications) throw new NotFoundError(`No user: ${username}`);
+            return applications;
+    }
+
 }
 
 

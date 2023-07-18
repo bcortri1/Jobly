@@ -269,7 +269,7 @@ describe("filterAll", function () {
     });
 
     test("No Filter", async function () {
-        expect(await Job.filterAll({})).toEqual("No Filter")
+        expect(await Job.filterAll({})).toEqual(await Job.findAll())
     });
 });
 
