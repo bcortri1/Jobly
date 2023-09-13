@@ -5,10 +5,16 @@ const jsData = { example2: "ex2" };
 const expectedResult = { setCols: '"ex1"=$1, "ex2"=$2', values: ['val1', 'val2'] };
 
 describe("sqlForPartialUpdate", function () {
-    test("Valid Data", function () {
+    test("Valid Data Two Columns", function () {
         let result = sqlForPartialUpdate(updateData, jsData);
         expect(result.setCols).toEqual(expectedResult.setCols);
         expect(result.values).toEqual(expectedResult.values);
+    });
+
+    test("Valid Data One Column", function () {
+        let result = sqlForPartialUpdate({example2: "val2" }, jsData);
+        expect(result.setCols).toEqual('"ex2"=$1');
+        expect(result.values).toEqual(['val2']);
     });
 
     test("Invalid Data", function () {
