@@ -97,12 +97,6 @@ function sqlFilter(data) {
             values.push("0")
             cols.push(`"equity">$${idx}`);
         }
-        //needs to account for null
-        else if(data.hasEquity === false){
-            idx +=1;
-            values.push("0")
-            cols.push(`"equity">=$${idx}`);
-        }
     }
 
     return {

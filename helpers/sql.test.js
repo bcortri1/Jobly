@@ -102,7 +102,7 @@ describe("Jobs: sqlFilter", function () {
 
     test("Valid all filter with equity false", function () {
         let filterData = { title: "j", minSalary: "100", hasEquity: false }
-        let filterResult = { filterCols: '"title" ILIKE ($1) AND "salary">=$2 AND "equity">=$3' , values: ['%j%', '100', '0'] }
+        let filterResult = { filterCols: '"title" ILIKE ($1) AND "salary">=$2' , values: ['%j%', '100'] }
         let result = sqlFilter(filterData);
         expect(result.filterCols).toEqual(filterResult.filterCols);
         expect(result.values).toEqual(filterResult.values);
@@ -126,7 +126,8 @@ describe("Jobs: sqlFilter", function () {
 
     test("Equity filter false", function () {
         let filterData = { hasEquity: false }
-        let filterResult = { filterCols: '"equity">=$1', values: ['0'] }
+        //let filterResult = { filterCols: '"equity">=$1', values: ['0'] }
+        let filterResult = { filterCols: '', values: [] }
         let result = sqlFilter(filterData);
         console.log(result)
         expect(result.filterCols).toEqual(filterResult.filterCols);
