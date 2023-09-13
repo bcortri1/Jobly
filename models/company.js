@@ -69,7 +69,7 @@ class Company {
 
     static async filterAll(data) {
         const { filterCols, values } = sqlFilter(data)
-        if ((filterCols === "No Filter")||(values === [])) {
+        if ((filterCols === "No Filter")) {
             // Will default to findAll
             return Company.findAll();
         }

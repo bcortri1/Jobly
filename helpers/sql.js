@@ -103,9 +103,6 @@ function sqlFilter(data) {
             values.push("0")
             cols.push(`"equity">=$${idx}`);
         }
-        else {
-            
-        }
     }
 
     return {
